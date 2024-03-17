@@ -2,7 +2,6 @@ import express from "express";
 import { conn } from "../dbconn"; // Assuming you have a db connection file named dbconn.js
 import bodyParser from 'body-parser';
 import { Request, Response, Router } from 'express';
-import { MysqlError, FieldInfo } from 'mysql';
 export const router = express.Router();
 
 router.use(bodyParser.json());
@@ -226,45 +225,13 @@ router.post("/signin", (req, res) => {
 // // });
 
 
-
-interface Post {
-    id: number;
-    // กำหนดชนิดของ properties อื่น ๆ ของ post ตามที่มีในฐานข้อมูล
-}
-
-interface PostChange {
-    id: number;
-    change: number;
-}
-
 router.get("/top-posts", (req, res) => {
-    conn.query('SELECT * FROM post ORDER BY score DESC LIMIT 10', (err: MysqlError | null, currentTopPosts: Post[], fields) => {
+    conn.query('SELECT * FROM post ORDER BY score DESC LIMIT 10', (err, result, fields) => {
         if (err) {
             console.error("Error fetching top posts:", err);
             res.status(500).json({ error: "Internal Server Error" });
         } else {
-            conn.query('SELECT * FROM previous_day_posts ORDER BY score DESC LIMIT 10', (err: MysqlError | null, previousTopPosts: Post[], fields) => {
-                if (err) {
-                    console.error("Error fetching previous day's top posts:", err);
-                    res.status(500).json({ error: "Internal Server Error" });
-                } else {
-                    // Find changes in rankings
-                    let changes: PostChange[] = [];
-                    currentTopPosts.forEach((currentPost: Post, index: number) => {
-                        const previousPost = previousTopPosts.find((post: Post) => post.id === currentPost.id);
-                        if (previousPost) {
-                            const previousIndex: number = previousTopPosts.indexOf(previousPost);
-                            const change: number = previousIndex - index;
-                            changes.push({ id: currentPost.id, change });
-                        }
-                    });
-                    res.json({ currentTopPosts, changes });
-                }
-            });
+            res.json(result);
         }
     });
 });
-
-
-
-
