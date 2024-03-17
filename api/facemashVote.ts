@@ -4,9 +4,10 @@ import bodyParser from 'body-parser';
 import { Request, Response, Router } from 'express';
 export const router = express.Router();
 
+
 router.use(bodyParser.json());
 router.get("/", (req, res) => {
-    conn.query('SELECT * FROM post INNER JOIN users ON posts.user_id = users.user_id;', (err, result, fields) => {
+    conn.query('SELECT * FROM post INNER JOIN users ON post.user_id = users.user_id;', (err, result, fields) => {
         if (err) {
             res.json(err);
         } else {
@@ -70,11 +71,15 @@ router.post('/', async (req: Request, res: Response) => {
         for (const postScore of allPostsScores) {
             const initialEloRating = postScore.score;
 
-            await queryAsync('INSERT INTO vote (post_id, newRating, oldRating, time) VALUES (?, ?, ?, CURRENT_TIMESTAMP())', [
+            // ในฟังก์ชัน vote
+            const currentTime = new Date(); // สร้างวัตถุ Date ที่มีค่าเป็นเวลาปัจจุบัน
+            await queryAsync('INSERT INTO vote (post_id, newRating, oldRating, time) VALUES (?, ?, ?, ?)', [
                 postScore.post_id,
                 postScore.score,
                 initialEloRating,
+                currentTime, // ใช้ค่าเวลาปัจจุบันในการ insert
             ]);
+
         }
 
         // 7. อัปเดตอันดับของโพสต์ในตาราง "votes"
@@ -101,11 +106,6 @@ router.post('/', async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Error processing vote' });
     }
 });
-
-
-
-
-
 
 
 // ฟังก์ชันทำ query ในฐานข้อมูล แบบ Promise:
