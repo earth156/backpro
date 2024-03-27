@@ -27,13 +27,15 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import multer from "multer";
-import { router as index } from "./api/index";
+import { router as index, router } from "./api/index";
 import { router as facemash } from "./api/facemash";
 import { router as ranking } from "./api/facemashRank";
 // import { router as uploadPost } from "./api/facemash-upload";
 import { router as vote } from "./api/facemashVote";
 // import { router as profile } from "./api/facemash-profile";
-
+import  {router as profile } from "./api/facemashProfile";
+import { router as uploadpicture } from "./api/facemashUpload"; // Correct import statement
+import  {router as edit } from "./api/facemashEdit";
 export const app = express();
 
 app.use(
@@ -49,5 +51,7 @@ app.use("/", index);
 app.use("/facemash", facemash);
 app.use("/facemash/vote", vote);
 app.use("/facemash/ranking", ranking);
+app.use("/facemash/profile", profile);
+app.use("/facemash/edit", edit);
+app.use("/facemash/upload", uploadpicture);
 // app.use("/facemash/profile", profile);
-// app.use("/facemash/upload", uploadPost);

@@ -6,6 +6,7 @@ export const router = express.Router();
 
 
 router.use(bodyParser.json());
+
 router.get("/", (req, res) => {
     conn.query('SELECT * FROM post INNER JOIN users ON post.user_id = users.user_id;', (err, result, fields) => {
         if (err) {
