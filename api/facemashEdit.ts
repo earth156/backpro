@@ -19,9 +19,39 @@ router.put("/:userId", (req, res) => {
         return res.status(400).json({ error: "Updated data is required" });
     }
 
-    const { first_name, last_name, password } = updatedData;
+    const { first_name, last_name, password, profile } = updatedData;
 
-    conn.query('UPDATE users SET first_name = ?, last_name = ?, password = ? WHERE user_id = ?', [first_name, last_name, password, userId], (updateErr, updateResult) => {
+    let updateQuery = 'UPDATE users SET ';
+    const updateParams = [];
+
+    if (first_name) {
+        updateQuery += 'first_name = ?, ';
+        updateParams.push(first_name);
+    }
+
+    if (last_name) {
+        updateQuery += 'last_name = ?, ';
+        updateParams.push(last_name);
+    }
+
+    if (password) {
+        updateQuery += 'password = ?, ';
+        updateParams.push(password);
+    }
+
+    if (profile) {
+        updateQuery += 'profile = ?, ';
+        updateParams.push(profile);
+    }
+
+    // ลบเครื่องหมาย , ที่ไม่จำเป็นที่ตำแหน่งสุดท้ายของสตริง
+    updateQuery = updateQuery.slice(0, -2);
+
+    // เพิ่มเงื่อนไข WHERE สำหรับ user_id
+    updateQuery += ' WHERE user_id = ?';
+    updateParams.push(userId);
+
+    conn.query(updateQuery, updateParams, (updateErr, updateResult) => {
         if (updateErr) {
             console.error("Error updating user data:", updateErr);
             return res.status(500).json({ error: "Internal Server Error" });
@@ -30,4 +60,5 @@ router.put("/:userId", (req, res) => {
         res.json(updateResult);
     });
 });
+
 
