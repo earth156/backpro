@@ -2,8 +2,10 @@ import express from "express";
 import { conn } from "../dbconn"; // Assuming you have a db connection file named dbconn.js
 import bodyParser from 'body-parser';
 import { Request, Response, Router } from 'express';
-export const router = express.Router();
+import cors from 'cors'; // เพิ่มการนำเข้า cors
 
+export const router = express.Router();
+router.use(cors()); // เพิ่ม middleware cors ที่ใช้งาน
 router.use(bodyParser.json());
 
 //แสดงข้อมูล User ทั้งหมด
