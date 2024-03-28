@@ -9,7 +9,7 @@
 //     const userId = req.params.userId; // เก็บค่า userId จาก req.params เพื่อใช้ใน SQL query
 //     conn.query('SELECT users.*, post.* FROM users LEFT JOIN post ON users.user_id = post.user_id WHERE post.user_id = ?', [userId], (err, result, fields) => {
 //         if (err) {
-//             console.error("Error fetching users and their posts:", err);
+//             console.error("Error fetching users and their post:", err);
 //             res.status(500).json({ error: "Internal Server Error" });
 //         } else {
 //             res.json(result);
@@ -35,12 +35,12 @@ router.get("/:userId", (req, res) => {
 
     conn.query('SELECT post.*, users.first_name, users.last_name, users.profile FROM post JOIN users ON post.user_id = users.user_id WHERE post.user_id = ?', [userId], (err, result, fields) => {
         if (err) {
-            console.error("Error fetching user's posts:", err);
+            console.error("Error fetching user's post:", err);
             return res.status(500).json({ error: "Internal Server Error" });
         }
 
         if (result.length === 0) {
-            return res.status(404).json({ error: "User not found or has no posts" });
+            return res.status(404).json({ error: "User not found or has no post" });
         }
 
         res.json(result);
@@ -56,7 +56,7 @@ router.get("/:userId", (req, res) => {
 // router.get("/", (req, res) => {
 //     conn.query('SELECT * FROM post', (err, result, fields) => {
 //         if (err) {
-//             console.error("Error fetching posts:", err);
+//             console.error("Error fetching post:", err);
 //             res.status(500).json({ error: "Internal Server Error" });
 //         } else {
 //             res.json(result);

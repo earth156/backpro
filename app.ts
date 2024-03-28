@@ -36,6 +36,8 @@ import { router as vote } from "./api/facemashVote";
 import  {router as profile } from "./api/facemashProfile";
 import { router as uploadpicture } from "./api/facemashUpload"; // Correct import statement
 import  {router as edit } from "./api/facemashEdit";
+import  {router as admin } from "./api/facemashAdmin";
+import  {router as graph } from "./api/facemashGraph";
 export const app = express();
 
 app.use(
@@ -53,5 +55,7 @@ app.use("/facemash/vote", vote);
 app.use("/facemash/ranking", ranking);
 app.use("/facemash/profile", profile);
 app.use("/facemash/edit", edit);
+app.use("/facemash/admin", admin);
+app.use("/facemash/graph", graph);
 app.use("/facemash/upload", uploadpicture);
-// app.use("/facemash/profile", profile);
+

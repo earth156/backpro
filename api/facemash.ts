@@ -69,7 +69,7 @@ router.post("/signin", (req, res) => {
 //   const time = new Date(); // ดึงเวลาปัจจุบัน
   
 //   // กำหนดการค้นหาคะแนนรวมของโพสต์ที่ถูกโหวต
-//   const query = 'INSERT INTO votes ( post_id,user_id score, time) VALUES (?, ?, ?,?) ON DUPLICATE KEY UPDATE total_score = total_score + VALUES(score)';
+//   const query = 'INSERT INTO vote ( post_id,user_id score, time) VALUES (?, ?, ?,?) ON DUPLICATE KEY UPDATE total_score = total_score + VALUES(score)';
   
 //   conn.query(query,
 //     [postId,userId ,  score, time],
@@ -90,7 +90,7 @@ router.post("/signin", (req, res) => {
 // ส่วนแสดงข้อมูลการโหวตของ 2 คน
 // router.get("/", (req, res) => {
 //     // ดึงข้อมูลจากฐานข้อมูล โพสต์ และผู้ใช้
-//     conn.query('SELECT * FROM posts INNER JOIN users ON posts.user_id = users.user_id;', (err, result, fields) => {
+//     conn.query('SELECT * FROM post INNER JOIN users ON post.user_id = users.user_id;', (err, result, fields) => {
 //         if (err) {
 //             res.json(err);
 //         } else {
@@ -123,10 +123,10 @@ router.post("/signin", (req, res) => {
 //         const { winnerPostId, loserPostId } = req.body;
 
 //         // Fetch post data from the database based on winnerPostId and loserPostId
-//         const [selectedWinner] = await queryAsync('SELECT * FROM posts WHERE post_id = ?', [winnerPostId]);
-//         const [selectedLoser] = await queryAsync('SELECT * FROM posts WHERE post_id = ?', [loserPostId]);
+//         const [selectedWinner] = await queryAsync('SELECT * FROM post WHERE post_id = ?', [winnerPostId]);
+//         const [selectedLoser] = await queryAsync('SELECT * FROM post WHERE post_id = ?', [loserPostId]);
 
-//         // Check if both posts exist
+//         // Check if both post exist
 //         if (!selectedWinner || !selectedLoser) {
 //             return res.status(404).json({ error: 'Winner or loser post not found' });
 //         }
@@ -149,22 +149,22 @@ router.post("/signin", (req, res) => {
 //         );
 
 //         // Update database with new Elo ratings for the winner
-//         await queryAsync('UPDATE posts SET eloRating = ? WHERE post_id = ?', [
+//         await queryAsync('UPDATE post SET eloRating = ? WHERE post_id = ?', [
 //             updatedEloRatingWinner,
 //             winnerPostId
 //         ]);
 
 //         // Update database with new Elo ratings for the loser
-//         await queryAsync('UPDATE posts SET eloRating = ? WHERE post_id = ?', [
+//         await queryAsync('UPDATE post SET eloRating = ? WHERE post_id = ?', [
 //             updatedEloRatingLoser,
 //             loserPostId
 //         ]);
 
 //         // Fetch updated winner post data
-//         const [updatedWinner] = await queryAsync('SELECT * FROM posts WHERE post_id = ?', [winnerPostId]);
+//         const [updatedWinner] = await queryAsync('SELECT * FROM post WHERE post_id = ?', [winnerPostId]);
 
 //         // Fetch updated loser post data
-//         const [updatedLoser] = await queryAsync('SELECT * FROM posts WHERE post_id = ?', [loserPostId]);
+//         const [updatedLoser] = await queryAsync('SELECT * FROM post WHERE post_id = ?', [loserPostId]);
 
 //         // Return response with old-rating and new-rating
 //         res.json({
@@ -213,10 +213,10 @@ router.post("/signin", (req, res) => {
 //     };
 // }
 
-// // router.get("/top-posts", (req, res) => {
+// // router.get("/top-post", (req, res) => {
 // //     conn.query('SELECT * FROM post ORDER BY score DESC', (err, result, fields) => {
 // //         if (err) {
-// //             console.error("Error fetching posts:", err);
+// //             console.error("Error fetching post:", err);
 // //             res.status(500).json({ error: "Internal Server Error" });
 // //         } else {
 // //             res.json(result);
@@ -225,10 +225,10 @@ router.post("/signin", (req, res) => {
 // // });
 
 
-router.get("/top-posts", (req, res) => {
+router.get("/top-post", (req, res) => {
     conn.query('SELECT * FROM post ORDER BY score DESC LIMIT 10', (err, result, fields) => {
         if (err) {
-            console.error("Error fetching top posts:", err);
+            console.error("Error fetching top post:", err);
             res.status(500).json({ error: "Internal Server Error" });
         } else {
             res.json(result);
