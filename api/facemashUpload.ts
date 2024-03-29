@@ -5,29 +5,31 @@ import { Request, Response, Router } from 'express';
 export const router = express.Router();
 router.use(bodyParser.json());
 
-// router.get("/:userId", (req, res) => {
-//   const userId = req.params.userId;
+router.get("/:userId", (req, res) => {
+  const userId = req.params.userId;
   
-//   if (!userId) {
-//       return res.status(400).json({ error: "User ID is required" });
-//   }
-//    // หากมีข้อมูลผู้ใช้ ก็ดึงข้อมูลโพสต์ของผู้ใช้นั้น
-//    conn.query('SELECT picture FROM post WHERE user_id = ?', [userId], (postErr, postResult, postFields) => {
-//     if (postErr) {
-//         console.error("Error fetching user's post:", postErr);
-//         return res.status(500).json({ error: "Internal Server Error" });
-//     }
+  if (!userId) {
+      return res.status(400).json({ error: "User ID is required" });
+  }
 
-//     if (postResult.length === 0) {
-//         return res.status(404).json({ error: "User has no post" });
-//     }
+  conn.query('SELECT post.*, users.first_name, users.last_name, users.profile FROM post JOIN users ON post.user_id = users.user_id WHERE post.user_id = ?', [userId], (err, result, fields) => {
+      if (err) {
+          console.error("Error fetching user's post:", err);
+          return res.status(500).json({ error: "Internal Server Error" });
+      }
 
-//     res.json(postResult);
-//   });
-// });
+      if (result.length === 0) {
+          return res.status(404).json({ error: "User not found or has no post" });
+      }
+
+      res.json(result);
+  });
+});
+
 
 router.post('/', (req, res) => {
-  const { id, picture, time } = req.body; // รับข้อมูลภาพและ id จาก Angular
+  const { id, picture } = req.body; // รับข้อมูลภาพ, id จาก Angular
+  const time = new Date(); // เวลาปัจจุบัน
 
   // เช็คว่าข้อมูลภาพไม่ว่างเปล่า
   if (!picture) {
@@ -50,7 +52,7 @@ router.post('/', (req, res) => {
     }
 
     // ทำการ insert ข้อมูลภาพ, id, เวลา และคะแนน ลงในฐานข้อมูล MySQL
-    const sql = 'INSERT INTO post (user_id, picture, time, score) VALUES (?, ?, ?, 1200)';
+    const sql = 'INSERT INTO post (user_id, picture, time, score, newRank) VALUES (?, ?, ?, 1200, 0)';
     conn.query(sql, [id, picture, time], (err, result) => {
       if (err) {
         console.error('Error inserting picture:', err);
@@ -58,6 +60,28 @@ router.post('/', (req, res) => {
       }
       res.status(201).json({ message: 'Picture uploaded successfully' });
     });
+  });
+});
+
+router.delete('/:postId', (req, res) => {
+  const postId = req.params.postId;
+
+  if (!postId) {
+    return res.status(400).json({ error: 'Post ID is required' });
+  }
+
+  // ทำการลบภาพโดยอ้างอิงจาก post_id
+  conn.query('DELETE FROM post WHERE post_id = ?', [postId], (err, result) => {
+    if (err) {
+      console.error('Error deleting post:', err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    res.status(200).json({ message: 'Post deleted successfully' });
   });
 });
 

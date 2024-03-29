@@ -33,19 +33,48 @@ router.get("/:userId", (req, res) => {
         return res.status(400).json({ error: "User ID is required" });
     }
 
-    conn.query('SELECT post.*, users.first_name, users.last_name, users.profile FROM post JOIN users ON post.user_id = users.user_id WHERE post.user_id = ?', [userId], (err, result, fields) => {
-        if (err) {
-            console.error("Error fetching user's post:", err);
+    // Check if the user has a profile picture
+    const checkPictureSql = 'SELECT COUNT(*) AS picture_count FROM post WHERE user_id = ?';
+    conn.query(checkPictureSql, [userId], (checkErr, checkResult) => {
+        if (checkErr) {
+            console.error("Error checking profile picture:", checkErr);
             return res.status(500).json({ error: "Internal Server Error" });
         }
 
-        if (result.length === 0) {
-            return res.status(404).json({ error: "User not found or has no post" });
-        }
+        const pictureCount = checkResult[0].picture_count;
 
-        res.json(result);
+        if (pictureCount > 0) {
+            // If the user has a profile picture, retrieve user's posts with pictures
+            conn.query('SELECT post.*, users.first_name, users.last_name, users.profile FROM post JOIN users ON post.user_id = users.user_id WHERE post.user_id = ?', [userId], (err, result, fields) => {
+                if (err) {
+                    console.error("Error fetching user's post:", err);
+                    return res.status(500).json({ error: "Internal Server Error" });
+                }
+
+                if (result.length === 0) {
+                    return res.status(404).json({ error: "User not found or has no post" });
+                }
+
+                res.json(result);
+            });
+        } else {
+            // If the user does not have a profile picture, retrieve user's profile information
+            conn.query('SELECT first_name, last_name, profile FROM users WHERE user_id = ?', [userId], (profileErr, profileResult, profileFields) => {
+                if (profileErr) {
+                    console.error("Error fetching user's profile:", profileErr);
+                    return res.status(500).json({ error: "Internal Server Error" });
+                }
+
+                if (profileResult.length === 0) {
+                    return res.status(404).json({ error: "User not found" });
+                }
+
+                res.json(profileResult);
+            });
+        }
     });
 });
+
 
 
 
