@@ -27,8 +27,9 @@ router.get("/:userId", (req, res) => {
 });
 
 
-router.post('/', (req, res) => {
-  const { id, picture } = req.body; // รับข้อมูลภาพ, id จาก Angular
+router.post('/:userId', (req, res) => {
+  const userId = req.params.userId; // เก็บค่า userId ที่ส่งมาเป็นพารามิเตอร์
+  const { picture } = req.body; // รับข้อมูลภาพจาก Angular
   const time = new Date(); // เวลาปัจจุบัน
 
   // เช็คว่าข้อมูลภาพไม่ว่างเปล่า
@@ -38,7 +39,7 @@ router.post('/', (req, res) => {
 
   // เช็คว่า user_id มีรูปภาพอยู่แล้ว 5 รูปหรือไม่
   const countSql = 'SELECT COUNT(*) AS picture_count FROM post WHERE user_id = ?';
-  conn.query(countSql, [id], (countErr, countResult) => {
+  conn.query(countSql, [userId], (countErr, countResult) => {
     if (countErr) {
       console.error('Error counting pictures:', countErr);
       return res.status(500).json({ error: 'Internal Server Error' });
@@ -51,9 +52,9 @@ router.post('/', (req, res) => {
       return res.status(400).json({ error: 'User already has 5 pictures' });
     }
 
-    // ทำการ insert ข้อมูลภาพ, id, เวลา และคะแนน ลงในฐานข้อมูล MySQL
+    // ทำการ insert ข้อมูลภาพ, user_id, เวลา และคะแนน ลงในฐานข้อมูล MySQL
     const sql = 'INSERT INTO post (user_id, picture, time, score, newRank) VALUES (?, ?, ?, 1200, 0)';
-    conn.query(sql, [id, picture, time], (err, result) => {
+    conn.query(sql, [userId, picture, time], (err, result) => {
       if (err) {
         console.error('Error inserting picture:', err);
         return res.status(500).json({ error: 'Internal Server Error' });
@@ -62,6 +63,9 @@ router.post('/', (req, res) => {
     });
   });
 });
+
+module.exports = router;
+
 
 router.delete('/:postId', (req, res) => {
   const postId = req.params.postId;
