@@ -5,33 +5,33 @@ import { Request, Response, Router } from 'express';
 export const router = express.Router();
 router.use(bodyParser.json());
 
-router.get("/:userId", (req, res) => {
-  const userId = req.params.userId;
+// router.get("/:userId", (req, res) => {
+//   const userId = req.params.userId;
   
-  if (!userId) {
-      return res.status(400).json({ error: "User ID is required" });
-  }
+//   if (!userId) {
+//       return res.status(400).json({ error: "User ID is required" });
+//   }
 
-  conn.query('SELECT post.*, users.first_name, users.last_name, users.profile FROM post JOIN users ON post.user_id = users.user_id WHERE post.user_id = ?', [userId], (err, result, fields) => {
-      if (err) {
-          console.error("Error fetching user's post:", err);
-          return res.status(500).json({ error: "Internal Server Error" });
-      }
+//   conn.query('SELECT post.*, users.first_name, users.last_name, users.profile FROM post JOIN users ON post.user_id = users.user_id WHERE post.user_id = ?', [userId], (err, result, fields) => {
+//       if (err) {
+//           console.error("Error fetching user's post:", err);
+//           return res.status(500).json({ error: "Internal Server Error" });
+//       }
 
-      if (result.length === 0) {
-          return res.status(404).json({ error: "User not found or has no post" });
-      }
+//       if (result.length === 0) {
+//           return res.status(404).json({ error: "User not found or has no post" });
+//       }
 
-      res.json(result);
-  });
-});
+//       res.json(result);
+//   });
+// });
 
 
 router.post('/:userId', (req, res) => {
   const userId = req.params.userId; // เก็บค่า userId ที่ส่งมาเป็นพารามิเตอร์
   const { picture } = req.body; // รับข้อมูลภาพจาก Angular
   const time = new Date(); // เวลาปัจจุบัน
-
+  
   // เช็คว่าข้อมูลภาพไม่ว่างเปล่า
   if (!picture) {
     return res.status(400).json({ error: 'No picture provided' });
@@ -64,29 +64,29 @@ router.post('/:userId', (req, res) => {
   });
 });
 
-module.exports = router;
 
 
-router.delete('/:postId', (req, res) => {
-  const postId = req.params.postId;
 
-  if (!postId) {
-    return res.status(400).json({ error: 'Post ID is required' });
-  }
+// router.delete('/:postId', (req, res) => {
+//   const postId = req.params.postId;
 
-  // ทำการลบภาพโดยอ้างอิงจาก post_id
-  conn.query('DELETE FROM post WHERE post_id = ?', [postId], (err, result) => {
-    if (err) {
-      console.error('Error deleting post:', err);
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
+//   if (!postId) {
+//     return res.status(400).json({ error: 'Post ID is required' });
+//   }
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Post not found' });
-    }
+//   // ทำการลบภาพโดยอ้างอิงจาก post_id
+//   conn.query('DELETE FROM post WHERE post_id = ?', [postId], (err, result) => {
+//     if (err) {
+//       console.error('Error deleting post:', err);
+//       return res.status(500).json({ error: 'Internal Server Error' });
+//     }
 
-    res.status(200).json({ message: 'Post deleted successfully' });
-  });
-});
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ error: 'Post not found' });
+//     }
+
+//     res.status(200).json({ message: 'Post deleted successfully' });
+//   });
+// });
 
 
