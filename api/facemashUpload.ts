@@ -53,7 +53,7 @@ router.post('/:userId', (req, res) => {
     }
 
     // ทำการ insert ข้อมูลภาพ, user_id, เวลา และคะแนน ลงในฐานข้อมูล MySQL
-    const sql = 'INSERT INTO post (user_id, picture, time, score, newRank) VALUES (?, ?, ?, 1200, 0)';
+    const sql = 'INSERT INTO post (user_id, picture, time, score, newRank) VALUES (?, ?, ?, 1200, null)';
     conn.query(sql, [userId, picture, time], (err, result) => {
       if (err) {
         console.error('Error inserting picture:', err);
